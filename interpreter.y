@@ -69,8 +69,10 @@ start: row cell EOL {
 row: row cell COMMA{
 	std::string rowString($1), cellString($2), output;
 	output =  rowString + ",\"" + cellString + "\"";
-  strcpy($$, output.c_str()); // add quotes around cells
   std::cout << "out: " << output << std::endl;
+  free($$);
+  $$ = (char*)malloc(sizeof(char) * output.length());
+  strcpy($$, output.c_str()); // add quotes around cells
   printf("rcc: %s\n",$$);
 }
 | row COMMA {
@@ -82,7 +84,11 @@ row: row cell COMMA{
   std::string cellString($1);
   strcpy($$, ("\"" + cellString + "\"").c_str());
   printf("start of new row\n");
-}
+ }
+| COMMA {
+	strcpy($$, "\"\",");
+	printf("start of new row with empty cell");
+  }
 ;
 
 cell: CELLCONTENTS {

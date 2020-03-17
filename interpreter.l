@@ -34,7 +34,7 @@ int doubleQuoteCount = 0;
 					yylval.sVal = strdup(yytext);
 					return CELLCONTENTS; 
 				}
-<INCELL>([^"])*\"	{
+<INCELL>([^"])*\"	{    //" feel free to ignore this comment
 					yylval.sVal = strdup(yytext);
 					yylval.sVal[strlen(yylval.sVal) - 1] = '\0';  // erase the ending quote
 					BEGIN QUOTEINCELL;
