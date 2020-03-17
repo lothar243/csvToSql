@@ -61,9 +61,18 @@ public:
 %%
 
 start: row cell EOL {
-			printf("The input was%s\n\n", $1); 
+	std::string rowString($1), cellString($2), output;
+	output = rowString + ",\"" + cellString + "\"";
+	std::cout << "The input was " << output << std::endl << std::endl;
+
 		} start
-	| /* NULL */
+		|
+		row EOL { // the row ended with a comma
+			std::string rowString($1), output;
+			output = rowString + ",\"\"";
+			std::cout << "The input was " << output << std::endl << std::endl;
+		  }
+		|
 	;
 	
 row: row cell COMMA{
@@ -77,17 +86,23 @@ row: row cell COMMA{
 }
 | row COMMA {
   std::string rowString($1);
+  free($$);
+  $$ = (char*)malloc(sizeof(char) * (rowString.length() + 4));
   strcpy($$, (rowString + ",\"\"").c_str()); // add a blank cell
   printf("rcc: blank cell\n");
 }
 | cell COMMA {
   std::string cellString($1);
+  free($$);
+  $$ = (char*)malloc(sizeof(char) * (cellString.length() + 3));
   strcpy($$, ("\"" + cellString + "\"").c_str());
   printf("start of new row\n");
  }
 | COMMA {
-	strcpy($$, "\"\",");
-	printf("start of new row with empty cell");
+	free($$);
+	$$ = (char*)malloc(sizeof(char) * 3);
+	strcpy($$, "\"\"");
+	printf("start of new row with empty cell\n");
   }
 ;
 
