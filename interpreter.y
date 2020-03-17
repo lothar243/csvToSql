@@ -51,6 +51,7 @@ public:
 %token CELLCONTENTS
 %token WS
 %token EOL
+%token SOL
 
 /*** Define return type for grammar rules ***/
 %type<sVal> row
@@ -59,24 +60,30 @@ public:
 %type<sVal> CELLCONTENTS
 %%
 
-start: row { 
+start: row cell EOL {
 			printf("The input was%s\n\n", $1); 
 		} start
 	| /* NULL */
 	;
 	
-row: cell COMMA row {
-			std::string cellString($1), rowString($3);
-			strcpy($$, ("\"" + cellString + "\"," + rowString).c_str()); // add quotes around cells
-//			printf("rcc: %s\n",$$);
-		}
-	|
-		cell EOL {
-			std::string cellString($1);
-			strcpy($$, ("\"" + cellString + "\"").c_str());
-			printf("cell(row): %s\n",$$);
-		}
-	;
+row: row cell COMMA{
+	std::string rowString($1), cellString($2), output;
+	output =  rowString + ",\"" + cellString + "\"";
+  strcpy($$, output.c_str()); // add quotes around cells
+  std::cout << "out: " << output << std::endl;
+  printf("rcc: %s\n",$$);
+}
+| row COMMA {
+  std::string rowString($1);
+  strcpy($$, (rowString + ",\"\"").c_str()); // add a blank cell
+  printf("rcc: blank cell\n");
+}
+| cell COMMA {
+  std::string cellString($1);
+  strcpy($$, ("\"" + cellString + "\"").c_str());
+  printf("start of new row\n");
+}
+;
 
 cell: CELLCONTENTS {
 			printf("c: %s\n",$$);
