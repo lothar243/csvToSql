@@ -10,4 +10,4 @@ lex.yy.c: interpreter.l
 	flex interpreter.l
 
 interpreter.out: interpreter.l interpreter.y interpreter.tab.c lex.yy.c
-	$(CC) $(CFLAGS) interpreter.tab.c lex.yy.c -lfl -o interpreter.out
+	$(CC) $(CFLAGS) interpreter.tab.c lex.yy.c -o interpreter.out

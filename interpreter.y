@@ -68,7 +68,7 @@ start: row {
 row: cell COMMA row {
 			std::string cellString($1), rowString($3);
 			strcpy($$, ("\"" + cellString + "\"," + rowString).c_str()); // add quotes around cells
-			printf("rcc: %s\n",$$);
+//			printf("rcc: %s\n",$$);
 		}
 	|
 		cell EOL {
@@ -81,15 +81,21 @@ row: cell COMMA row {
 cell: CELLCONTENTS {
 			printf("c: %s\n",$$);
 		}
-	| CELLCONTENTS QUOTE {
-			std::string cellString($1);
-			strcpy($$, (cellString + "\\\"").c_str());
-			printf("adding quotes: %s\n",$$);
+		| cell QUOTE {
+			std::string cell1String($1);
+			strcpy($$, (cell1String + "\\\"").c_str());
+			printf("appending two cells: %s\n",$$);
+
+		}
+		| cell CELLCONTENTS {
+			std::string cell1String($1), cell2String($2);
+			strcpy($$, (cell1String + cell2String).c_str());
+			printf("appending two cells: %s\n",$$);
 			
 		}
 	| QUOTE {
-			strcpy($$, "\"");
-			printf("starting with quotes: %s\n",$$);
+			strcpy($$, "\\\"");
+			printf("encountered quotes: %s\n",$$);
 		}
 	;
 
