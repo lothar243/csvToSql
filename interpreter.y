@@ -60,30 +60,36 @@ public:
 %%
 
 start: row { 
-				 printf("The input was%s\n\n", $1); 
+			printf("The input was%s\n\n", $1); 
 		} start
 	| /* NULL */
 	;
 	
 row: cell COMMA row {
 			std::string cellString($1), rowString($3);
-			strcpy($$, (cellString + "," + rowString).c_str());
+			strcpy($$, ("\"" + cellString + "\"," + rowString).c_str()); // add quotes around cells
 			printf("rcc: %s\n",$$);
 		}
 	|
 		cell EOL {
-			$$ = $1;
+			std::string cellString($1);
+			strcpy($$, ("\"" + cellString + "\"").c_str());
 			printf("cell(row): %s\n",$$);
 		}
 	;
 
-cell: QUOTE cell QUOTE {
-			$$ = $2;
-		}
-	| CELLCONTENTS {
-			std::string cellString($1);
-			strcpy($$, ("\"" + cellString + "\"").c_str());
+cell: CELLCONTENTS {
 			printf("c: %s\n",$$);
+		}
+	| CELLCONTENTS QUOTE {
+			std::string cellString($1);
+			strcpy($$, (cellString + "\\\"").c_str());
+			printf("adding quotes: %s\n",$$);
+			
+		}
+	| QUOTE {
+			strcpy($$, "\"");
+			printf("starting with quotes: %s\n",$$);
 		}
 	;
 

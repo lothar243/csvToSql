@@ -6,6 +6,7 @@
  their data values returned here.
 ***/
 
+%x INCELL
 
 %{
 #include <string>
@@ -25,26 +26,20 @@ int doubleQuoteCount = 0;
 ***/
 %%
 
-[ \t]           { return WS; }
-
-[\r\n]            { return EOL; }
-
-,				{ 	if(doubleQuoteCount == 0) 
-						return COMMA; 
-				}
-\"				{ 	if(doubleQuoteCount == 0) 
-						doubleQuoteCount = 1;
-					else 
-						doubleQuoteCount = 0;
-					return QUOTE; 
-				}
-[^,|^\"|^\n]*          	{
-//					std::string stringObject(strdup(yytext));
-//					yylval.sVal = stringObject;
+\n			{ return EOL; }
+\"			{ BEGIN INCELL; }
+,			{ return COMMA; }
+[^,|^\"|^\n]*	{
 					yylval.sVal = strdup(yytext);
 					return CELLCONTENTS; 
 				}
-
+<INCELL>\"\"		{ return QUOTE; }
+<INCELL>([^"])*\"	{
+					yylval.sVal = strdup(yytext);
+					yylval.sVal[strlen(yylval.sVal) - 1] = '\0';  // erase the ending quote
+					BEGIN INITIAL;
+					return CELLCONTENTS;
+				}
 
 
 %%
